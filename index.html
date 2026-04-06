@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MDT / CAD System</title>
+
+<style>
+body { margin:0; font-family:Segoe UI, sans-serif; background:#0f172a; color:white; }
+header { background:#020617; padding:12px 20px; display:flex; justify-content:space-between; }
+.title { font-weight:bold; }
+.container { display:flex; height:calc(100vh - 50px); }
+.sidebar { width:250px; background:#020617; padding:15px; }
+.sidebar button { width:100%; margin-bottom:10px; padding:10px; background:#1e293b; color:white; border:none; cursor:pointer; }
+.main { flex:1; padding:15px; overflow:auto; }
+.card { background:#1e293b; padding:12px; margin-bottom:10px; border-radius:8px; }
+input { padding:8px; width:100%; margin-bottom:10px; border-radius:6px; border:none; }
+.badge { padding:3px 6px; border-radius:4px; font-size:11px; }
+.active { background:green; }
+.pending { background:orange; }
+.danger { background:red; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title">Sentinel Patrol MDT / CAD</div>
+  <div id="user"></div>
+</header>
+
+<div class="container">
+
+<div class="sidebar">
+  <button onclick="showTab('dashboard')">Dashboard</button>
+  <button onclick="showTab('calls')">Active Calls</button>
+  <button onclick="showTab('units')">Units</button>
+  <button onclick="showTab('search')">Search DB</button>
+</div>
+
+<div class="main" id="main"></div>
+
+</div>
+
+<script>
+let currentTab = "dashboard";
+
+// SAMPLE DATA
+const calls = [
+  { id:"C001", type:"Traffic Stop", location:"Adelaide", status:"Active" },
+  { id:"C002", type:"Robbery", location:"Sydney", status:"Pending" }
+];
+
+const units = [
+  { name:"Unit 12", status:"Active" },
+  { name:"Unit 21", status:"Busy" }
+];
+
+const records = [
+  { name:"John Doe", dob:"1990", flags:"None" },
+  { name:"Jane Smith", dob:"1985", flags:"Warrant" }
+];
+
+function showTab(tab){ currentTab = tab; render(); }
+
+function render(){
+  const main = document.getElementById("main");
+  main.innerHTML = "";
+
+  if(currentTab === "dashboard"){
+    main.innerHTML = `
+      <div class="card">Active Calls: ${calls.length}</div>
+      <div class="card">Units: ${units.length}</div>
+    `;
+  }
+
+  if(currentTab === "calls"){
+    calls.forEach(c => {
+      main.innerHTML += `
+        <div class="card">
+          ${c.id} - ${c.type}<br>
+          ${c.location}<br>
+          <span class="badge ${c.status==='Active'?'active':'pending'}">${c.status}</span>
+        </div>
+      `;
+    });
+  }
+
+  if(currentTab === "units"){
+    units.forEach(u => {
+      main.innerHTML += `
+        <div class="card">
+          ${u.name}<br>
+          <span class="badge ${u.status==='Active'?'active':'danger'}">${u.status}</span>
+        </div>
+      `;
+    });
+  }
+
+  if(currentTab === "search"){
+    main.innerHTML = `
+      <input id="search" placeholder="Search name..." oninput="searchDB()">
+      <div id="results"></div>
+    `;
+  }
+}
+
+function searchDB(){
+  const val = document.getElementById("search").value.toLowerCase();
+  const res = document.getElementById("results");
+  res.innerHTML = "";
+
+  records.filter(r => r.name.toLowerCase().includes(val))
+  .forEach(r => {
+    res.innerHTML += `
+      <div class="card">
+        ${r.name}<br>
+        DOB: ${r.dob}<br>
+        Flags: ${r.flags}
+      </div>
+    `;
+  });
+}
+
+render();
+</script>
+
+</body>
+</html>
